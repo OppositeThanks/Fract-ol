@@ -6,7 +6,7 @@
 /*   By: lperrin <lperrin@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2022/07/25 10:55:12 by lperrin           #+#    #+#             */
-/*   Updated: 2022/09/29 14:24:27 by lperrin          ###   ########.fr       */
+/*   Updated: 2022/10/03 14:34:44 by lperrin          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,18 +37,14 @@ void mandelbrot(t_data *data, int x, int y, double cr, double ci)
 	zr = 0;
 	zi = 0;
 	it = -1;
-	included = 1;
-	write(1, "si\n", 4);
 	while (it++ < MAX_ITERATION)
 	{
-		write(1, "si2\n", 4);
+		included = 1;
 		if ((zr * zr + zi * zi) > 4.0)
 		{
-			write(1, "si3\n", 4);
 			included = 0;
 			break;
 		}
-		write(1, "si4\n", 4);
 		tmp = 2 * zr * zi + ci;
 		zr = zr * zr - zi * zi + cr;
 		zi = tmp;
@@ -59,42 +55,56 @@ void mandelbrot(t_data *data, int x, int y, double cr, double ci)
 		mlx_put_pixel(data->img, x, y, 0xFF0000FF);
 }
 
+/* void	mandelbrot_init(void)
+{
+	data.min_r = -2.0;
+	data.max_r = 1.0;
+	data.min_i = -1.5;
+	data.max_i = data.min_i + (data.max_r - data.min_r) * height / width;
+	
+} */
+
 int	main(void)
 {
 	mlx_t	*mlx;
 	t_data	img;
 	t_data	data;
+	unsigned int height;
+	unsigned int width;
 
-	mlx = mlx_init(800, 600, "Fract-ol", 1);
+	height = 600;
+	width = 800;
+
+	mlx = mlx_init(width, height, "Fract-ol", 1);
 	if (!mlx)
 	{
 		printf("Mlx couldn't init");
 		return (0);
 	}
-	img.img = mlx_new_image(mlx, WIDTH, HEIGHT);
+	img.img = mlx_new_image(mlx, width, height);
 	//Def of limits between Real nbrs && Unreal nbrs for mandelbrot
 	data.min_r = -2.0;
 	data.max_r = 1.0;
-	data.min_i = -1.5;
-	data.min_i = data.min_i + (data.max_r - data.min_r) * HEIGHT / WIDTH;
+	data.min_i = -1.2;
+	data.max_i = data.min_i + (data.max_r - data.min_r) * height / width;
 	//Drawing proc set up first two iterations of double pixel r && i init x && y
-	int x;
-	int y;
+	unsigned int x;
+	unsigned int y;
 	double pr;
 	double pi;
 	
-	y = -1;
-	while (y++ < HEIGHT)
+	y = 0;
+	while (y < height)
 	{
-		write(1, "c\n", 2);
-		x = -1;
-		while (x++ < WIDTH)
+		x = 0;
+		while (x < width)
 		{
-			write(1, "b\n", 2);
-			pr = data.min_r + x * ((data.max_r - data.min_r) / WIDTH);
-			pi = data.min_i + y * ((data.max_i - data.min_i) / HEIGHT);
+			pr = data.min_r + x * ((data.max_r - data.min_r) / width);
+			pi = data.min_i + y * ((data.max_i - data.min_i) / height);
 			mandelbrot(&img, x, y, pr, pi);
+			x++;
 		}
+		y++;
 	}
 	mlx_image_to_window(mlx, img.img, 0, 0);
 	mlx_loop(mlx);
@@ -103,8 +113,8 @@ int	main(void)
 }
 
 /* //calcule nbr complx d'un pixel :
-cr = min_r + x * (max_r - min_r) / WIDTH;
-ci = min_i + y * (max_i - min_i) / HEIGHT;
+cr = min_r + x * (max_r - min_r) / width;
+ci = min_i + y * (max_i - min_i) / height;
 zr = zr * zr - zi * zi + cr;
 zi = 2 * zr * zi + ci;
 if ((zr * zr + zi * zi) > 4)
